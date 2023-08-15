@@ -70,19 +70,21 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
           xs: 480,
           xxs: 0,
         }}
+        verticalCompact={false}
         //브레이크 포인트마다의 column 개수
         cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 3 }}
         //각 행의 높이
         rowHeight={150}
         width={1000}
         onLayoutChange={onLayoutChange}
+        //브레이크 포인트 체인지도 꼭 필요한지 검증 필요
         onBreakpointChange={onBreakpointChange}
         isResizable={isEditMode}
         isDraggable={isEditMode}
       >
         {widgetList.map((widget) => (
           // 초기 위젯 위치와 높이 설정
-          <div key={widget.widgetId} data-grid={{ x: 0, y: 0, w: 2, h: 2 }}>
+          <div key={widget.widgetId} data-grid={{ x: 0, y: 0, w: 4, h: 4 }}>
             <Grid item sx={{ width: "100%", height: "100%" }}>
               <WidgetCard widgetInfo={widget}>
                 <WidgetComponent widgetInfo={widget} />

@@ -1,4 +1,5 @@
 import React from "react";
+import { Input } from "@mui/material";
 
 interface WidgetInfo {
   widgetTitle: string;
@@ -13,6 +14,7 @@ const WidgetComponent: React.FC<WidgetComponentProps> = ({ widgetInfo }) => {
   //위젯 내용을 표시
   return (
     <div>
+      <Input sx={{width: "100%"}}/>
       <h2>{widgetInfo.widgetTitle}</h2>
       <p>{widgetInfo.widgetContent}</p>
     </div>
