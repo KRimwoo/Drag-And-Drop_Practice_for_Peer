@@ -12,37 +12,37 @@ export const randomPastelColor = () => {
 
 const widgetList = [
   {
-    widgetId: 1,
+    widgetId: 0,
     widgetTitle: "Weather Widget",
     widgetContent: "Today's weather: Sunny",
     widgetColor: randomPastelColor(),
   },
   {
-    widgetId: 2,
+    widgetId: 1,
     widgetTitle: "News Widget",
     widgetContent: "Latest news: React 18 Released!",
     widgetColor: randomPastelColor(),
   },
   {
-    widgetId: 3,
+    widgetId: 2,
     widgetTitle: "Stock Widget",
     widgetContent: "AAPL: $150.25 (+0.5%)",
     widgetColor: randomPastelColor(),
   },
   {
-    widgetId: 4,
+    widgetId: 3,
     widgetTitle: "Todo List Widget",
     widgetContent: "Tasks: Buy groceries, Finish project",
     widgetColor: randomPastelColor(),
   },
   {
-    widgetId: 5,
+    widgetId: 4,
     widgetTitle: "Calendar Widget",
     widgetContent: "Upcoming events: Meeting at 3 PM, Dinner with friends",
     widgetColor: randomPastelColor(),
   },
   {
-    widgetId: 6,
+    widgetId: 5,
     widgetTitle: "Fitness Tracker Widget",
     widgetContent: "Today's steps: 7500, Calories burned: 300",
     widgetColor: randomPastelColor(),

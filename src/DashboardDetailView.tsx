@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Responsive, WidthProvider } from "react-grid-layout";
+import React, { useEffect, useState, useSyncExternalStore } from "react";
+import { Responsive, WidthProvider, Layout } from "react-grid-layout";
 import Grid from "@mui/material/Grid";
 import WidgetCard from "./WidgetCard";
 import WidgetComponent from "./WidgetComponent";
@@ -8,6 +8,13 @@ import { randomPastelColor } from "./App";
 
 interface DashboardDetailViewProps {
   widgetList: Array<any>;
+}
+
+interface LayoutItem {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
 }
 
 //반응형 그리드 레이아웃 사용
@@ -22,26 +29,71 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
 }) => {
   const [isEditMode, setIsEditMode] = useState(false);
 
-
-
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [widgets, setWidgets] = useState(widgetList);
+  const [currentBreakpoint, setCurrentBreakpoint] = useState("lg")
+  const [index, setIndex] = useState(widgetList.length);
 
+  const [droppable, setDroppable] = useState(true);
+  const [shouldHandleLayoutChange, setShouldHandleLayoutChange] = useState(true);
   
-  
-  const [state, setState] = useState({
+  const [state, setState] = useState<{
+    breakpoints: string;
+    layouts: {
+      [key: string]: { x: number; y: number; w: number; h: number; i: string }[];
+    };
+  }>({
     breakpoints: "lg",
-    layouts: { lg: [] },
+    layouts: { lg: [
+      {x: 0, y: 0, w: 1, h: 1, i: '0'},
+      {x: 0, y: 0, w: 1, h: 1, i: '1'},
+      {x: 0, y: 0, w: 1, h: 1, i: '2'},
+      {x: 0, y: 0, w: 1, h: 1, i: '3'},
+      {x: 0, y: 0, w: 1, h: 1, i: '4'},
+      {x: 0, y: 0, w: 1, h: 1, i: '5'},
+    ]},
   });
+
+
+  //레이아웃 공간 계산
+  useEffect(()=> {
+    let totalVol = 0;
+    widgets.map((widget, index) => (
+      totalVol += (state.layouts[currentBreakpoint][index].w * state.layouts[currentBreakpoint][index].h)
+    ))
+    console.log(totalVol);
+    if (totalVol >= 30) {
+      setDroppable(false);
+    }
+  }, [state])
 
   //레이아웃이 변경될 때, 해당 브레이크포인트에 레이아웃 정보를 업데이트 힌다
   const onLayoutChange = (layout: any, layouts: any) => {
+    console.log("layout", layouts);
     setState((prevState) => ({
       ...prevState,
       layouts: layouts,
     }));
-    console.log(state);
+    console.log("layoutchange:", state);
+    //drop이 있을경우
+    const currentLayout = layouts[currentBreakpoint];
+    console.log("currentlayout:", currentLayout);
+    if (currentLayout) {
+      const droppingElem = currentLayout.find((item: any) => item.i === "__dropping-elem__");
+      console.log(droppingElem);
+      if (droppingElem) {
+        setWidgets((prevWidgets) => [
+          ...prevWidgets,
+          {
+            widgetId: index,
+            widgetTitle: title,
+            widgetContent: content,
+            widgetColor: randomPastelColor(),
+          },
+        ]);
+      }
+    }
   };
 
   const handleTitleChange = (event: any) => {
@@ -52,28 +104,50 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
     setContent(event.target.value);
   };
 
-  const handleDrop = (event: any) => {
+  const onDrop = (layout: Layout[], layoutItem: Layout, event: Event) => {
+    //레이아웃 업데이트
+    setState((prevState) => {
+      console.log(layoutItem);
+      const newLayouts = { ...prevState.layouts };
+      if (newLayouts[currentBreakpoint]) {
+        newLayouts[currentBreakpoint].push({
+          x: layoutItem.x,
+          y: layoutItem.y,
+          w: layoutItem.w,
+          h: layoutItem.h,
+          i: String(index),
+        });
+      }
+      
+      return {
+        ...prevState,
+        layouts: newLayouts,
+      };
+    });
+    //위젯내용 업데이트
     setWidgets((prevWidgets) => [
       ...prevWidgets,
-      {
-        widgetId: prevWidgets.length + 1,
+      { 
+        widgetId: index,
         widgetTitle: title,
         widgetContent: content,
         widgetColor: randomPastelColor(),
       },
     ]);
-    console.log(state);
+    console.log("ondrop:", state);
     setTitle("");
     setContent("");
+    setIndex(index + 1);
   };
 
   //브레이크포인트가 변경될 때
   const onBreakpointChange = (breakpoint: string) => {
+    setCurrentBreakpoint(breakpoint);
     setState((prevState) => ({
       ...prevState,
       breakpoints: breakpoint,
     }));
-    //console.log(state);
+    console.log("breakpoint change!: ", state);
   };
 
   return (
@@ -131,7 +205,7 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
         compactType={null}
         preventCollision={true}
         //브레이크 포인트마다의 column 개수
-        cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 3 }}
+        cols={{ lg: 5, md: 5, sm: 5, xs: 5, xxs: 5 }}
         //각 행의 높이
         rowHeight={150}
         width={1000}
@@ -152,12 +226,20 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
           borderRadius: "5px",
           border: "2px solid #3a3a3a",
         }}
-        onDrop={(event) => handleDrop(event)}
-        
+        //onDrop={onDrop}
+        isDroppable={droppable}
       >
-        {widgetList.map((widget) => (
+        {widgets.map((widget, index) => (
           // 초기 위젯 위치와 높이 설정
-          <div key={widget.widgetId} data-grid={{ x: 0, y: 0, w: 1, h: 1 }}>
+          <div 
+            key={widget.widgetId} 
+            data-grid={{ 
+              x: state.layouts[currentBreakpoint][index].x, 
+              y: state.layouts[currentBreakpoint][index].y, 
+              w: state.layouts[currentBreakpoint][index].w, 
+              h: state.layouts[currentBreakpoint][index].h
+            }}
+          >
             <Grid item sx={{ width: "100%", height: "100%" }}>
               <WidgetCard widgetInfo={widget}>
                 <WidgetComponent widgetInfo={widget} />
