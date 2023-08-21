@@ -3,7 +3,8 @@ import { Responsive, WidthProvider } from "react-grid-layout";
 import Grid from "@mui/material/Grid";
 import WidgetCard from "./WidgetCard";
 import WidgetComponent from "./WidgetComponent";
-import { Button } from "@mui/material";
+import { Button, Input } from "@mui/material";
+import { randomPastelColor } from "./App";
 
 interface DashboardDetailViewProps {
   widgetList: Array<any>;
@@ -21,6 +22,14 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
 }) => {
   const [isEditMode, setIsEditMode] = useState(false);
 
+
+
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [widgets, setWidgets] = useState(widgetList);
+
+  
+  
   const [state, setState] = useState({
     breakpoints: "lg",
     layouts: { lg: [] },
@@ -33,6 +42,29 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
       layouts: layouts,
     }));
     console.log(state);
+  };
+
+  const handleTitleChange = (event: any) => {
+    setTitle(event.target.value);
+  };
+
+  const handleContentChange = (event: any) => {
+    setContent(event.target.value);
+  };
+
+  const handleDrop = (event: any) => {
+    setWidgets((prevWidgets) => [
+      ...prevWidgets,
+      {
+        widgetId: prevWidgets.length + 1,
+        widgetTitle: title,
+        widgetContent: content,
+        widgetColor: randomPastelColor(),
+      },
+    ]);
+    console.log(state);
+    setTitle("");
+    setContent("");
   };
 
   //브레이크포인트가 변경될 때
@@ -52,6 +84,7 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
           display: "flex",
           justifyContent: "space-between",
           padding: "10px",
+          width: "900px",
         }}
       >
         <h1>Dashbord</h1>
@@ -59,6 +92,31 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
         <Button onClick={() => setIsEditMode(!isEditMode)}>
           {isEditMode ? "확인" : "편집"}
         </Button>
+      </div>
+      <div style={{ backgroundColor: "skyblue", padding: 10 }}>
+        <div
+          style={{
+            backgroundColor: "green",
+            width: "100px",
+            alignItems: "center",
+            margin: 10,
+          }}
+          className="droppable-element"
+          draggable={true}
+        >
+          <Input
+            value={title}
+            onChange={handleTitleChange}
+            fullWidth
+            sx={{ height: "100%", backgroundColor: "white" }}
+          />
+          <Input
+            value={content}
+            onChange={handleContentChange}
+            fullWidth
+            sx={{ height: "100%", backgroundColor: "white" }}
+          />
+        </div>
       </div>
       <ResponsiveGridLayout
         layouts={state.layouts}
@@ -70,21 +128,36 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
           xs: 480,
           xxs: 0,
         }}
-        verticalCompact={false}
+        compactType={null}
+        preventCollision={true}
         //브레이크 포인트마다의 column 개수
         cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 3 }}
         //각 행의 높이
         rowHeight={150}
         width={1000}
+        //최대 행 개수
+        maxRows={6}
         onLayoutChange={onLayoutChange}
         //브레이크 포인트 체인지도 꼭 필요한지 검증 필요
-        onBreakpointChange={onBreakpointChange}
+        //onBreakpointChange={onBreakpointChange}
         isResizable={isEditMode}
         isDraggable={isEditMode}
+        style={{
+          //너비는 reponsive에 맞게 최소 480~1200
+          maxWidth: "1200px",
+          minWidth: "480px",
+          //높이 고정
+          minHeight: "970px",
+          maxHeight: "970px",
+          borderRadius: "5px",
+          border: "2px solid #3a3a3a",
+        }}
+        onDrop={(event) => handleDrop(event)}
+        
       >
         {widgetList.map((widget) => (
           // 초기 위젯 위치와 높이 설정
-          <div key={widget.widgetId} data-grid={{ x: 0, y: 0, w: 4, h: 4 }}>
+          <div key={widget.widgetId} data-grid={{ x: 0, y: 0, w: 1, h: 1 }}>
             <Grid item sx={{ width: "100%", height: "100%" }}>
               <WidgetCard widgetInfo={widget}>
                 <WidgetComponent widgetInfo={widget} />

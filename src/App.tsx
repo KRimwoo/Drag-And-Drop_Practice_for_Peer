@@ -2,7 +2,7 @@ import './App.css';
 import DashboardDetailView from './DashboardDetailView';
 
 //랜덤 컬러 생성
-const randomPastelColor = () => {
+export const randomPastelColor = () => {
   const hue = Math.floor(Math.random() * 360);
   const saturation = 70 + Math.floor(Math.random() * 30);
   const lightness = 70 + Math.floor(Math.random() * 30);
