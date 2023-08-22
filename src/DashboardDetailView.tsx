@@ -38,6 +38,8 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
 
   const [droppable, setDroppable] = useState(true);
 
+  const [droppingItem, setDroppingItem] = useState({ i: "__dropping-elem__", w: 1, h: 1 });
+
   const [state, setState] = useState<{
     breakpoints: string;
     layouts: {
@@ -114,7 +116,7 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
 
   //레이아웃이 변경될 때, 해당 브레이크포인트에 레이아웃 정보를 업데이트 힌다
   const onLayoutChange = (layout: any, layouts: any) => {
-    console.log("layout", layouts);
+    console.log("layout", layout);
     // setState((prevState) => ({
     //   ...prevState,
     //   layouts: layouts,
@@ -151,6 +153,12 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
   };
 
   const handleDragStart = (event: React.DragEvent<HTMLDivElement>) => {
+    if (event.currentTarget.id === 'text-input') {
+      setDroppingItem({ i: "__dropping-elem__", w: 2, h: 1 });
+    }
+    else if (event.currentTarget.id === 'image-input') {
+      setDroppingItem({ i: "__dropping-elem__", w: 2, h: 2 });
+    }
     event.dataTransfer.setData("text/plain", event.currentTarget.id);
   };
 
@@ -336,6 +344,7 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
         isResizable={isEditMode}
         isDraggable={isEditMode}
         isDroppable={droppable}
+        droppingItem={droppingItem}
         style={{
           //너비는 reponsive에 맞게 최소 480~1200
           maxWidth: "1200px",
@@ -346,7 +355,7 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
           borderRadius: "5px",
           border: "2px solid #3a3a3a",
         }}
-        //onLayoutChange={onLayoutChange}
+        onLayoutChange={onLayoutChange}
         onBreakpointChange={onBreakpointChange}
         onDrop={onDrop}
       >
