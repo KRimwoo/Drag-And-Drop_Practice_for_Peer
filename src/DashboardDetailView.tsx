@@ -32,68 +32,113 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [widgets, setWidgets] = useState(widgetList);
-  const [currentBreakpoint, setCurrentBreakpoint] = useState("lg")
+  const [currentBreakpoint, setCurrentBreakpoint] = useState("lg");
   const [index, setIndex] = useState(widgetList.length);
 
   const [droppable, setDroppable] = useState(true);
-  const [shouldHandleLayoutChange, setShouldHandleLayoutChange] = useState(true);
-  
+  const [shouldHandleLayoutChange, setShouldHandleLayoutChange] =
+    useState(true);
+
   const [state, setState] = useState<{
     breakpoints: string;
     layouts: {
-      [key: string]: { x: number; y: number; w: number; h: number; i: string }[];
+      [key: string]: {
+        x: number;
+        y: number;
+        w: number;
+        h: number;
+        i: string;
+      }[];
     };
   }>({
     breakpoints: "lg",
-    layouts: { lg: [
-      {x: 0, y: 0, w: 1, h: 1, i: '0'},
-      {x: 0, y: 0, w: 1, h: 1, i: '1'},
-      {x: 0, y: 0, w: 1, h: 1, i: '2'},
-      {x: 0, y: 0, w: 1, h: 1, i: '3'},
-      {x: 0, y: 0, w: 1, h: 1, i: '4'},
-      {x: 0, y: 0, w: 1, h: 1, i: '5'},
-    ]},
+    layouts: {
+      lg: [
+        { x: 0, y: 0, w: 1, h: 1, i: "0" },
+        { x: 0, y: 0, w: 1, h: 1, i: "1" },
+        { x: 0, y: 0, w: 1, h: 1, i: "2" },
+        { x: 0, y: 0, w: 1, h: 1, i: "3" },
+        { x: 0, y: 0, w: 1, h: 1, i: "4" },
+        { x: 0, y: 0, w: 1, h: 1, i: "5" },
+      ],
+      md: [
+        { x: 0, y: 0, w: 1, h: 1, i: "0" },
+        { x: 0, y: 0, w: 1, h: 1, i: "1" },
+        { x: 0, y: 0, w: 1, h: 1, i: "2" },
+        { x: 0, y: 0, w: 1, h: 1, i: "3" },
+        { x: 0, y: 0, w: 1, h: 1, i: "4" },
+        { x: 0, y: 0, w: 1, h: 1, i: "5" },
+      ],
+      sm: [
+        { x: 0, y: 0, w: 1, h: 1, i: "0" },
+        { x: 0, y: 0, w: 1, h: 1, i: "1" },
+        { x: 0, y: 0, w: 1, h: 1, i: "2" },
+        { x: 0, y: 0, w: 1, h: 1, i: "3" },
+        { x: 0, y: 0, w: 1, h: 1, i: "4" },
+        { x: 0, y: 0, w: 1, h: 1, i: "5" },
+      ],
+      xs: [
+        { x: 0, y: 0, w: 1, h: 1, i: "0" },
+        { x: 0, y: 0, w: 1, h: 1, i: "1" },
+        { x: 0, y: 0, w: 1, h: 1, i: "2" },
+        { x: 0, y: 0, w: 1, h: 1, i: "3" },
+        { x: 0, y: 0, w: 1, h: 1, i: "4" },
+        { x: 0, y: 0, w: 1, h: 1, i: "5" },
+      ],
+      xxs: [
+        { x: 0, y: 0, w: 1, h: 1, i: "0" },
+        { x: 0, y: 0, w: 1, h: 1, i: "1" },
+        { x: 0, y: 0, w: 1, h: 1, i: "2" },
+        { x: 0, y: 0, w: 1, h: 1, i: "3" },
+        { x: 0, y: 0, w: 1, h: 1, i: "4" },
+        { x: 0, y: 0, w: 1, h: 1, i: "5" },
+      ],
+    },
   });
 
-
   //레이아웃 공간 계산
-  useEffect(()=> {
+  useEffect(() => {
     let totalVol = 0;
-    widgets.map((widget, index) => (
-      totalVol += (state.layouts[currentBreakpoint][index].w * state.layouts[currentBreakpoint][index].h)
-    ))
+    widgets.map(
+      (widget, index) =>
+        (totalVol +=
+          state.layouts[currentBreakpoint][index].w *
+          state.layouts[currentBreakpoint][index].h)
+    );
     console.log(totalVol);
     if (totalVol >= 30) {
       setDroppable(false);
     }
-  }, [state])
+  }, [state]);
 
   //레이아웃이 변경될 때, 해당 브레이크포인트에 레이아웃 정보를 업데이트 힌다
   const onLayoutChange = (layout: any, layouts: any) => {
     console.log("layout", layouts);
-    setState((prevState) => ({
-      ...prevState,
-      layouts: layouts,
-    }));
-    console.log("layoutchange:", state);
-    //drop이 있을경우
-    const currentLayout = layouts[currentBreakpoint];
-    console.log("currentlayout:", currentLayout);
-    if (currentLayout) {
-      const droppingElem = currentLayout.find((item: any) => item.i === "__dropping-elem__");
-      console.log(droppingElem);
-      if (droppingElem) {
-        setWidgets((prevWidgets) => [
-          ...prevWidgets,
-          {
-            widgetId: index,
-            widgetTitle: title,
-            widgetContent: content,
-            widgetColor: randomPastelColor(),
-          },
-        ]);
-      }
-    }
+    // setState((prevState) => ({
+    //   ...prevState,
+    //   layouts: layouts,
+    // }));
+    // console.log("layoutchange:", state);
+    // //drop이 있을경우
+    // const currentLayout = layouts[currentBreakpoint];
+    // console.log("currentlayout:", currentLayout);
+    // if (currentLayout) {
+    //   const droppingElem = currentLayout.find(
+    //     (item: any) => item.i === "__dropping-elem__"
+    //   );
+    //   console.log(droppingElem);
+    //   if (droppingElem) {
+    //     setWidgets((prevWidgets) => [
+    //       ...prevWidgets,
+    //       {
+    //         widgetId: index,
+    //         widgetTitle: title,
+    //         widgetContent: content,
+    //         widgetColor: randomPastelColor(),
+    //       },
+    //     ]);
+    //   }
+    // }
   };
 
   const handleTitleChange = (event: any) => {
@@ -106,19 +151,23 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
 
   const onDrop = (layout: Layout[], layoutItem: Layout, event: Event) => {
     //레이아웃 업데이트
+    console.log(layoutItem);
     setState((prevState) => {
-      console.log(layoutItem);
       const newLayouts = { ...prevState.layouts };
-      if (newLayouts[currentBreakpoint]) {
-        newLayouts[currentBreakpoint].push({
-          x: layoutItem.x,
-          y: layoutItem.y,
-          w: layoutItem.w,
-          h: layoutItem.h,
-          i: String(index),
-        });
-      }
-      
+      const newItem = {
+        x: layoutItem.x,
+        y: layoutItem.y,
+        w: layoutItem.w,
+        h: layoutItem.h,
+        i: String(index),
+      };
+      // 모든 브레이크포인트에 대해 동일한 항목 추가
+      Object.keys(newLayouts).forEach((breakpoint) => {
+        if (newLayouts[breakpoint]) {
+          newLayouts[breakpoint].push(newItem);
+        }
+      });
+
       return {
         ...prevState,
         layouts: newLayouts,
@@ -127,7 +176,7 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
     //위젯내용 업데이트
     setWidgets((prevWidgets) => [
       ...prevWidgets,
-      { 
+      {
         widgetId: index,
         widgetTitle: title,
         widgetContent: content,
@@ -158,7 +207,7 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
           display: "flex",
           justifyContent: "space-between",
           padding: "10px",
-          width: "900px",
+          width: "500px",
         }}
       >
         <h1>Dashbord</h1>
@@ -211,11 +260,10 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
         width={1000}
         //최대 행 개수
         maxRows={6}
-        onLayoutChange={onLayoutChange}
         //브레이크 포인트 체인지도 꼭 필요한지 검증 필요
-        //onBreakpointChange={onBreakpointChange}
         isResizable={isEditMode}
         isDraggable={isEditMode}
+        isDroppable={droppable}
         style={{
           //너비는 reponsive에 맞게 최소 480~1200
           maxWidth: "1200px",
@@ -226,18 +274,19 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
           borderRadius: "5px",
           border: "2px solid #3a3a3a",
         }}
-        //onDrop={onDrop}
-        isDroppable={droppable}
+        onLayoutChange={onLayoutChange}
+        onBreakpointChange={onBreakpointChange}
+        onDrop={onDrop}
       >
         {widgets.map((widget, index) => (
           // 초기 위젯 위치와 높이 설정
-          <div 
-            key={widget.widgetId} 
-            data-grid={{ 
-              x: state.layouts[currentBreakpoint][index].x, 
-              y: state.layouts[currentBreakpoint][index].y, 
-              w: state.layouts[currentBreakpoint][index].w, 
-              h: state.layouts[currentBreakpoint][index].h
+          <div
+            key={widget.widgetId}
+            data-grid={{
+              x: state.layouts[currentBreakpoint][index].x,
+              y: state.layouts[currentBreakpoint][index].y,
+              w: state.layouts[currentBreakpoint][index].w,
+              h: state.layouts[currentBreakpoint][index].h,
             }}
           >
             <Grid item sx={{ width: "100%", height: "100%" }}>
