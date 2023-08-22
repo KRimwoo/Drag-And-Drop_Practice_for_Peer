@@ -30,16 +30,27 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
 }) => {
   const [isEditMode, setIsEditMode] = useState(false);
 
+  //input으로 받는 widget component요소들
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [widgets, setWidgets] = useState(widgetList);
+
+  
+  //현재 break point
   const [currentBreakpoint, setCurrentBreakpoint] = useState("lg");
+
+  //아이템 추가시의 index값
   const [index, setIndex] = useState(widgetList.length);
-
+  
+  //
   const [droppable, setDroppable] = useState(true);
-
+  //drag-drop중 onLayoutChange막기위함
+  const [isDroppaing, setIsDropping] = useState(false);
+  //droppable item 속성 설정
   const [droppingItem, setDroppingItem] = useState({ i: "__dropping-elem__", w: 1, h: 1 });
 
+  //위젯 리스트
+  const [widgets, setWidgets] = useState(widgetList);
+  
   const [state, setState] = useState<{
     breakpoints: string;
     layouts: {
@@ -108,40 +119,29 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
           state.layouts[currentBreakpoint][index].w *
           state.layouts[currentBreakpoint][index].h)
     );
-    console.log(totalVol);
+    console.log("totalVolume: ", totalVol);
     if (totalVol >= 30) {
+      console.log("grid is full!");
       setDroppable(false);
     }
   }, [state]);
 
   //레이아웃이 변경될 때, 해당 브레이크포인트에 레이아웃 정보를 업데이트 힌다
   const onLayoutChange = (layout: any, layouts: any) => {
-    console.log("layout", layout);
-    // setState((prevState) => ({
-    //   ...prevState,
-    //   layouts: layouts,
-    // }));
-    // console.log("layoutchange:", state);
-    // //drop이 있을경우
-    // const currentLayout = layouts[currentBreakpoint];
-    // console.log("currentlayout:", currentLayout);
-    // if (currentLayout) {
-    //   const droppingElem = currentLayout.find(
-    //     (item: any) => item.i === "__dropping-elem__"
-    //   );
-    //   console.log(droppingElem);
-    //   if (droppingElem) {
-    //     setWidgets((prevWidgets) => [
-    //       ...prevWidgets,
-    //       {
-    //         widgetId: index,
-    //         widgetTitle: title,
-    //         widgetContent: content,
-    //         widgetColor: randomPastelColor(),
-    //       },
-    //     ]);
-    //   }
-    // }
+    console.log("on change layout", layout);
+    //console.log("breakpoint", currentBreakpoint, "layouts", layouts);
+    if (isDroppaing) {
+      return ;
+    }
+    // 모든 breakpoint에 동일한 변경 사항을 반영
+    const updatedLayouts = Object.keys(layouts).reduce((acc: any, breakpoint) => {
+      acc[breakpoint] = layout;
+      return acc;
+    }, {});
+    setState((prevState) => ({
+      ...prevState,
+      layouts: updatedLayouts,
+    }));
   };
 
   const handleTitleChange = (event: any) => {
@@ -152,45 +152,60 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
     setContent(event.target.value);
   };
 
+
+  //Drag시작할 때
   const handleDragStart = (event: React.DragEvent<HTMLDivElement>) => {
+    //isDropping state 변경
+    setIsDropping(true);
+
+    //drag하는 item 종류 (id)에 따라 dropping item 속성 변경
     if (event.currentTarget.id === 'text-input') {
       setDroppingItem({ i: "__dropping-elem__", w: 2, h: 1 });
     }
     else if (event.currentTarget.id === 'image-input') {
       setDroppingItem({ i: "__dropping-elem__", w: 2, h: 2 });
     }
+    //drag 하는 item의 종류를 나중에 판별할 수 있도록 setData
     event.dataTransfer.setData("text/plain", event.currentTarget.id);
   };
 
+
+
+  //onDrop함수!!!!
   const onDrop = (layout: Layout[], layoutItem: Layout, event: Event) => {
     //레이아웃 업데이트
-    console.log("item:", layoutItem);
-    console.log("event:", event);
-    const droppedElementId = (event as any).dataTransfer.getData("text/plain");
-    console.log("Dropped element ID:", droppedElementId);
+    //console.log("item:", layoutItem);
+    //console.log("event:", event);
     
+    //drop하는 element의 종류(id) 가져옴 - handleDragStart에서 set했던 data를 get
+    const droppedElementId = (event as any).dataTransfer.getData("text/plain");
+    //console.log("Dropped element ID:", droppedElementId);
+    
+    //drop의 위치가 grid 벗어날 경우
+    if (layoutItem.x + layoutItem.w > 5 || layoutItem.y + layoutItem.h > 6){
+      console.log("wrong-drop!");
+      return ;
+    }
+
+    //drop된 element가 text-input일 때
     if (droppedElementId === "text-input") {
-      if (layoutItem.x + 2 > 5 || layoutItem.y + layoutItem.h > 6){
-        console.log("wrong-drop!");
-        return ;
-      }
       setState((prevState) => {
         const newLayouts = { ...prevState.layouts };
         const newItem = {
           x: layoutItem.x,
           y: layoutItem.y,
-          w: 2,
+          w: layoutItem.w,
           h: layoutItem.h,
           i: String(index),
+          //minW 설정
           minW: 2,
         };
-        // 모든 브레이크포인트에 대해 동일한 항목 추가
+        // 모든 breakpoint에 대해 동일한 항목 추가
         Object.keys(newLayouts).forEach((breakpoint) => {
           if (newLayouts[breakpoint]) {
             newLayouts[breakpoint].push(newItem);
           }
         });
-  
         return {
           ...prevState,
           layouts: newLayouts,
@@ -202,35 +217,34 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
         {
           widgetId: index,
           widgetTitle: title,
-          widgetContent: content? content : "",
+          //content 업데이트
+          widgetContent: content,
           widgetImage: "",
           widgetColor: randomPastelColor(),
         },
       ]);
     }
+
+    //drop된 element가 image-input일 때
     if (droppedElementId === "image-input") {
-      if (layoutItem.x + 2 > 5 || layoutItem.y + 2 > 6){
-        console.log("wrong-drop!");
-        return ;
-      }
       setState((prevState) => {
         const newLayouts = { ...prevState.layouts };
         const newItem = {
           x: layoutItem.x,
           y: layoutItem.y,
-          w: 2,
-          h: 2,
+          w: layoutItem.w,
+          h: layoutItem.h,
           i: String(index),
+          //minW, minH 설정
           minW: 2,
           minH: 2,
         };
-        // 모든 브레이크포인트에 대해 동일한 항목 추가
+        // 모든 breakpoint에 대해 동일한 항목 추가
         Object.keys(newLayouts).forEach((breakpoint) => {
           if (newLayouts[breakpoint]) {
             newLayouts[breakpoint].push(newItem);
           }
         });
-  
         return {
           ...prevState,
           layouts: newLayouts,
@@ -243,6 +257,7 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
           widgetId: index,
           widgetTitle: title,
           widgetContent: "",
+          //이미지 업데이트
           widgetImage: Image42,
           widgetColor: randomPastelColor(),
         },
@@ -252,6 +267,8 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
     setTitle("");
     setContent("");
     setIndex(index + 1);
+    //drag-drop 종료
+    setIsDropping(false);
   };
 
   //브레이크포인트가 변경될 때
@@ -361,6 +378,7 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
       >
         {widgets.map((widget, index) => (
           // 초기 위젯 위치와 높이 설정
+          // 위젯의 인덱스 값 -> state의 layout index값으로 찾아옴
           <div
             key={widget.widgetId}
             data-grid={{
