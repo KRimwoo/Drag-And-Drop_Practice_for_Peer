@@ -162,7 +162,12 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
     console.log("Dropped element ID:", droppedElementId);
     
     if (droppedElementId === "text-input") {
-      if (layoutItem.x + 2 > 5 || layoutItem.y + layoutItem.h > 6){
+      const isSpaceUnavailable = layout.every((item) => {
+        const isXOverlap = layoutItem.x + 2 > item.x && layoutItem.x < item.x + item.w;
+        const isYOverlap = layoutItem.y + layoutItem.h > item.y && layoutItem.y < item.y + item.h;
+        return (isXOverlap || isYOverlap);
+      });
+      if (layoutItem.x + 2 > 5 || layoutItem.y + layoutItem.h > 6 || !isSpaceUnavailable ){
         console.log("wrong-drop!");
         return ;
       }
@@ -201,7 +206,12 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
       ]);
     }
     if (droppedElementId === "image-input") {
-      if (layoutItem.x + 2 > 5 || layoutItem.y + 2 > 6){
+      const isSpaceUnavailable = layout.every((item) => {
+        const isXOverlap = layoutItem.x + 2 > item.x && layoutItem.x < item.x + item.w;
+        const isYOverlap = layoutItem.y + 2 > item.y && layoutItem.y < item.y + item.h;
+        return (isXOverlap || isYOverlap);
+      });
+      if (layoutItem.x + 2 > 5 || layoutItem.y + layoutItem.h > 6 || !isSpaceUnavailable ){
         console.log("wrong-drop!");
         return ;
       }
