@@ -206,30 +206,18 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
       <div
         style={{
           display: "flex",
-          justifyContent: "space-between",
           padding: "10px",
-          width: "500px",
+          maxWidth: "1200px",
         }}
       >
         <h1>Dashbord</h1>
         {/* 편집 버튼 */}
-        <Button onClick={() => setIsEditMode(!isEditMode)}>
+        <Button onClick={() => setIsEditMode(!isEditMode)} size="large" sx={{fontWeight: "bold"}}>
           {isEditMode ? "확인" : "편집"}
         </Button>
       </div>
-      <div style={{ backgroundColor: "gray", padding: 10, display: "flex" }}>
-        <div style={{width: "180px", height: "150px"}}>
-          <WidgetCard widgetInfo={Dummy1}>
-            <TextInputWidget />
-          </WidgetCard>
-        </div>
-        <div style={{width: "180px", height: "150px"}}>
-          <WidgetCard widgetInfo={Dummy1}>
-            <ImageInputWidget />
-          </WidgetCard>
-        </div>
-      </div>
-      <div style={{ backgroundColor: "skyblue", padding: 10, display: "flex" }}>
+      
+      <div style={{ backgroundColor: "skyblue", borderRadius: "5px", padding: 10, display: "flex", maxWidth: "1185px",}}>
         <Card
           style={{
             backgroundColor: "white",
