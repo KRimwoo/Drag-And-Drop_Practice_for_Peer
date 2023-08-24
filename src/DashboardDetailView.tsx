@@ -3,13 +3,22 @@ import { Responsive, WidthProvider, Layout } from "react-grid-layout";
 import Grid from "@mui/material/Grid";
 import WidgetCard from "./WidgetCard";
 import WidgetComponent from "./WidgetComponent";
-import { Button, Input } from "@mui/material";
+import { Button, Card, CardContent, Input } from "@mui/material";
 import { randomPastelColor } from "./App";
 import Image42 from "./assets/image42.jpeg";
+import TextInputWidget from "./components/TextInputWidget";
+import ImageInputWidget from "./components/ImageInputWidget";
+
+const Dummy1 = {
+  widgetId: 10,
+  widgetColor: "#ffffff",
+}
+
 
 interface DashboardDetailViewProps {
   widgetList: Array<any>;
 }
+
 
 interface LayoutItem {
   x: number;
@@ -29,10 +38,6 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
   widgetList,
 }) => {
   const [isEditMode, setIsEditMode] = useState(false);
-
-  //input으로 받는 widget component요소들
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
 
   
   //현재 break point
@@ -68,44 +73,14 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
     breakpoints: "lg",
     layouts: {
       lg: [
-        { x: 0, y: 0, w: 1, h: 1, i: "0" },
-        { x: 0, y: 0, w: 1, h: 1, i: "1" },
-        { x: 0, y: 0, w: 1, h: 1, i: "2" },
-        { x: 0, y: 0, w: 1, h: 1, i: "3" },
-        { x: 0, y: 0, w: 1, h: 1, i: "4" },
-        { x: 0, y: 0, w: 1, h: 1, i: "5" },
       ],
       md: [
-        { x: 0, y: 0, w: 1, h: 1, i: "0" },
-        { x: 0, y: 0, w: 1, h: 1, i: "1" },
-        { x: 0, y: 0, w: 1, h: 1, i: "2" },
-        { x: 0, y: 0, w: 1, h: 1, i: "3" },
-        { x: 0, y: 0, w: 1, h: 1, i: "4" },
-        { x: 0, y: 0, w: 1, h: 1, i: "5" },
       ],
       sm: [
-        { x: 0, y: 0, w: 1, h: 1, i: "0" },
-        { x: 0, y: 0, w: 1, h: 1, i: "1" },
-        { x: 0, y: 0, w: 1, h: 1, i: "2" },
-        { x: 0, y: 0, w: 1, h: 1, i: "3" },
-        { x: 0, y: 0, w: 1, h: 1, i: "4" },
-        { x: 0, y: 0, w: 1, h: 1, i: "5" },
       ],
       xs: [
-        { x: 0, y: 0, w: 1, h: 1, i: "0" },
-        { x: 0, y: 0, w: 1, h: 1, i: "1" },
-        { x: 0, y: 0, w: 1, h: 1, i: "2" },
-        { x: 0, y: 0, w: 1, h: 1, i: "3" },
-        { x: 0, y: 0, w: 1, h: 1, i: "4" },
-        { x: 0, y: 0, w: 1, h: 1, i: "5" },
       ],
       xxs: [
-        { x: 0, y: 0, w: 1, h: 1, i: "0" },
-        { x: 0, y: 0, w: 1, h: 1, i: "1" },
-        { x: 0, y: 0, w: 1, h: 1, i: "2" },
-        { x: 0, y: 0, w: 1, h: 1, i: "3" },
-        { x: 0, y: 0, w: 1, h: 1, i: "4" },
-        { x: 0, y: 0, w: 1, h: 1, i: "5" },
       ],
     },
   });
@@ -143,16 +118,6 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
       layouts: updatedLayouts,
     }));
   };
-
-  const handleTitleChange = (event: any) => {
-    setTitle(event.target.value);
-  };
-
-  const handleContentChange = (event: any) => {
-    setContent(event.target.value);
-  };
-
-
   //Drag시작할 때
   const handleDragStart = (event: React.DragEvent<HTMLDivElement>) => {
     //isDropping state 변경
@@ -187,85 +152,39 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
       return ;
     }
 
-    //drop된 element가 text-input일 때
-    if (droppedElementId === "text-input") {
-      setState((prevState) => {
-        const newLayouts = { ...prevState.layouts };
-        const newItem = {
-          x: layoutItem.x,
-          y: layoutItem.y,
-          w: layoutItem.w,
-          h: layoutItem.h,
-          i: String(index),
-          //minW 설정
-          minW: 2,
-        };
-        // 모든 breakpoint에 대해 동일한 항목 추가
-        Object.keys(newLayouts).forEach((breakpoint) => {
-          if (newLayouts[breakpoint]) {
-            newLayouts[breakpoint].push(newItem);
-          }
-        });
-        return {
-          ...prevState,
-          layouts: newLayouts,
-        };
+    setState((prevState) => {
+      const newLayouts = { ...prevState.layouts };
+      const newItem = {
+        x: layoutItem.x,
+        y: layoutItem.y,
+        w: layoutItem.w,
+        h: layoutItem.h,
+        i: String(index),
+        ...(droppedElementId === "text-input" ? { minW: 2 } : {}),
+        ...(droppedElementId === "image-input" ? { minW: 2, minH: 2 } : {})
+      };
+      // 모든 breakpoint에 대해 동일한 항목 추가
+      Object.keys(newLayouts).forEach((breakpoint) => {
+        if (newLayouts[breakpoint]) {
+          newLayouts[breakpoint].push(newItem);
+        }
       });
-      //위젯내용 업데이트
-      setWidgets((prevWidgets) => [
-        ...prevWidgets,
-        {
-          widgetId: index,
-          widgetTitle: title,
-          //content 업데이트
-          widgetContent: content,
-          widgetImage: "",
-          widgetColor: randomPastelColor(),
-        },
-      ]);
-    }
+      return {
+        ...prevState,
+        layouts: newLayouts,
+      };
+    });
 
-    //drop된 element가 image-input일 때
-    if (droppedElementId === "image-input") {
-      setState((prevState) => {
-        const newLayouts = { ...prevState.layouts };
-        const newItem = {
-          x: layoutItem.x,
-          y: layoutItem.y,
-          w: layoutItem.w,
-          h: layoutItem.h,
-          i: String(index),
-          //minW, minH 설정
-          minW: 2,
-          minH: 2,
-        };
-        // 모든 breakpoint에 대해 동일한 항목 추가
-        Object.keys(newLayouts).forEach((breakpoint) => {
-          if (newLayouts[breakpoint]) {
-            newLayouts[breakpoint].push(newItem);
-          }
-        });
-        return {
-          ...prevState,
-          layouts: newLayouts,
-        };
-      });
-      //위젯내용 업데이트
-      setWidgets((prevWidgets) => [
-        ...prevWidgets,
-        {
-          widgetId: index,
-          widgetTitle: title,
-          widgetContent: "",
-          //이미지 업데이트
-          widgetImage: Image42,
-          widgetColor: randomPastelColor(),
-        },
-      ]);
-    }
+    //위젯내용 업데이트
+    setWidgets((prevWidgets) => [
+      ...prevWidgets,
+      {
+        widgetId: index,
+        widgetType: droppedElementId,
+        widgetColor: randomPastelColor(),
+      },
+    ]);
     console.log("ondrop:", state);
-    setTitle("");
-    setContent("");
     setIndex(index + 1);
     //drag-drop 종료
     setIsDropping(false);
@@ -298,10 +217,22 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
           {isEditMode ? "확인" : "편집"}
         </Button>
       </div>
+      <div style={{ backgroundColor: "gray", padding: 10, display: "flex" }}>
+        <div style={{width: "180px", height: "150px"}}>
+          <WidgetCard widgetInfo={Dummy1}>
+            <TextInputWidget />
+          </WidgetCard>
+        </div>
+        <div style={{width: "180px", height: "150px"}}>
+          <WidgetCard widgetInfo={Dummy1}>
+            <ImageInputWidget />
+          </WidgetCard>
+        </div>
+      </div>
       <div style={{ backgroundColor: "skyblue", padding: 10, display: "flex" }}>
-        <div
+        <Card
           style={{
-            backgroundColor: "green",
+            backgroundColor: "white",
             width: "100px",
             alignItems: "center",
             margin: 10,
@@ -311,20 +242,11 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
           draggable={true}
           onDragStart={handleDragStart}
         >
-          <Input
-            value={title}
-            onChange={handleTitleChange}
-            fullWidth
-            sx={{ height: "50%", backgroundColor: "white" }}
-          />
-          <Input
-            value={content}
-            onChange={handleContentChange}
-            fullWidth
-            sx={{ height: "50%", backgroundColor: "white" }}
-          />
-        </div>
-        <div
+          <CardContent>
+            <h3>Text Box</h3>
+          </CardContent>
+        </Card>
+        <Card
           style={{
             width: "100px",
             alignItems: "center",
@@ -335,8 +257,10 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
           draggable={true}
           onDragStart={handleDragStart}
         >
-          <img src={Image42} alt="image-42" style={{width: "100%", height: "100%"}}/>
-        </div>
+          <CardContent>
+            <h3>Image Box</h3>
+          </CardContent>
+        </Card>
       </div>
       <ResponsiveGridLayout
         layouts={state.layouts}
@@ -392,7 +316,12 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
           >
             <Grid item sx={{ width: "100%", height: "100%" }}>
               <WidgetCard widgetInfo={widget}>
-                <WidgetComponent widgetInfo={widget} />
+                {widget.widgetType === "text-input" &&
+                  <TextInputWidget/>
+                }
+                {widget.widgetType === "image-input" &&
+                  <ImageInputWidget/>
+                }
               </WidgetCard>
             </Grid>
           </div>
