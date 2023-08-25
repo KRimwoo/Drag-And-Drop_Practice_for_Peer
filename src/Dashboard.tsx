@@ -2,10 +2,10 @@ import React, { useEffect, useState, useSyncExternalStore } from "react";
 import { Responsive, WidthProvider, Layout } from "react-grid-layout";
 import Grid from "@mui/material/Grid";
 import WidgetCard from "./WidgetCard";
-import WidgetComponent from "./WidgetComponent";
+//import WidgetComponent from "./WidgetComponent";
 import { Button, Card, CardContent, Input } from "@mui/material";
 import { randomPastelColor } from "./App";
-import Image42 from "./assets/image42.jpeg";
+//import Image42 from "./assets/image42.jpeg";
 import TextInputWidget from "./components/TextInputWidget";
 import ImageInputWidget from "./components/ImageInputWidget";
 
@@ -15,17 +15,17 @@ const Dummy1 = {
 }
 
 
-interface DashboardDetailViewProps {
+interface DashboardProps {
   widgetList: Array<any>;
 }
 
 
-interface LayoutItem {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-}
+//interface LayoutItem {
+//  x: number;
+//  y: number;
+//  w: number;
+//  h: number;
+//}
 
 //반응형 그리드 레이아웃 사용
 //여러 브레이크 포인트에 대한 레이아웃을 정의할 수 있다.
@@ -34,7 +34,7 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 //고정된 그리드를 기준으로 부모요소의 너비에 따라 반응한다.
 //const ResponsiveGridLayout = WidthProvider(React-grid-layout);
 
-const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
+const Dashboard: React.FC<DashboardProps> = ({
   widgetList,
 }) => {
   const [isEditMode, setIsEditMode] = useState(false);
@@ -46,8 +46,9 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
   //아이템 추가시의 index값
   const [index, setIndex] = useState(widgetList.length);
   
-  //
+  //그리드 영역이 꽉 차면 더이상 drop할 수 없음
   const [droppable, setDroppable] = useState(true);
+
   //drag-drop중 onLayoutChange막기위함
   const [isDroppaing, setIsDropping] = useState(false);
   //droppable item 속성 설정
@@ -60,7 +61,7 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
     breakpoints: string;
     layouts: {
       [key: string]: {
-        x: number;
+        x: number; 
         y: number;
         w: number;
         h: number;
@@ -101,10 +102,12 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
     }
   }, [state]);
 
-  //레이아웃이 변경될 때, 해당 브레이크포인트에 레이아웃 정보를 업데이트 힌다
+  //레이아웃이 변경될 때, 그 정보를 업데이트 한다.
   const onLayoutChange = (layout: any, layouts: any) => {
     console.log("on change layout", layout);
     //console.log("breakpoint", currentBreakpoint, "layouts", layouts);
+
+    //아이템이 dropping중 이라면 return
     if (isDroppaing) {
       return ;
     }
@@ -118,6 +121,7 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
       layouts: updatedLayouts,
     }));
   };
+  
   //Drag시작할 때
   const handleDragStart = (event: React.DragEvent<HTMLDivElement>) => {
     //isDropping state 변경
@@ -160,7 +164,9 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
         w: layoutItem.w,
         h: layoutItem.h,
         i: String(index),
+        //text-input의 최소 크기 2 * 1
         ...(droppedElementId === "text-input" ? { minW: 2 } : {}),
+        //image-input의 최소 크기 2 * 2
         ...(droppedElementId === "image-input" ? { minW: 2, minH: 2 } : {})
       };
       // 모든 breakpoint에 대해 동일한 항목 추가
@@ -197,7 +203,7 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
       ...prevState,
       breakpoints: breakpoint,
     }));
-    console.log("breakpoint change!: ", state);
+    console.log("breakpoint change!: ", breakpoint);
   };
 
   return (
@@ -216,8 +222,9 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
           {isEditMode ? "확인" : "편집"}
         </Button>
       </div>
-      
+      {/* 툴박스 영역 */}
       <div style={{ backgroundColor: "skyblue", borderRadius: "5px", padding: 10, display: "flex", maxWidth: "1185px",}}>
+        {/* 드롭할 수 있는 요소1 - 텍스트 박스 놓기 */}
         <Card
           style={{
             backgroundColor: "white",
@@ -225,24 +232,33 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
             alignItems: "center",
             margin: 10,
           }}
+          //드롭 가능한 요소 표시
           className="droppable-element"
-          id="text-input"
+          //드래그 가능한 요소 표시
           draggable={true}
+          //요소의 type을 id로 지정
+          id="text-input"
+          //드래그가 시작될 때 실행되는 함수
           onDragStart={handleDragStart}
         >
           <CardContent>
             <h3>Text Box</h3>
           </CardContent>
         </Card>
+        {/* 드롭할 수 있는 요소2 - 이미지 박스 놓기 */}
         <Card
           style={{
             width: "100px",
             alignItems: "center",
             margin: 10,
           }}
+          //드롭 가능한 요소 표시
           className="droppable-element"
-          id="image-input"
+          //드래그 가능한 요소 표시
           draggable={true}
+          //요소의 type을 id로 지정
+          id="image-input"
+          //드래그가 시작될 때 실행되는 함수
           onDragStart={handleDragStart}
         >
           <CardContent>
@@ -250,6 +266,8 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
           </CardContent>
         </Card>
       </div>
+
+      {/* 그리드 영역 */}
       <ResponsiveGridLayout
         layouts={state.layouts}
         //브레이크 포인트 기준
@@ -260,32 +278,45 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
           xs: 480,
           xxs: 0,
         }}
+        //한 행이나 열에서 아이템 배치에 따라 컴팩트하게 재배치되는 것을 방지
         compactType={null}
+        //하나의 그리드 아이템이 다른 아이템 위로 드래그되거나 리사이즈되는 것을 방지
         preventCollision={true}
         //브레이크 포인트마다의 column 개수
         cols={{ lg: 5, md: 5, sm: 5, xs: 5, xxs: 5 }}
-        //각 행의 높이
+        //각 행의 높이 (px)
         rowHeight={150}
-        width={1000}
+        //그리드 너비
+        width={1200}
         //최대 행 개수
         maxRows={6}
-        //브레이크 포인트 체인지도 꼭 필요한지 검증 필요
+        //isEditMode일때만 grid내의 resize, drag가능
+        //그리드 아이템의 resize 가능 여부
         isResizable={isEditMode}
+        //그리드 아이템의 drag 가능 여부
         isDraggable={isEditMode}
+        //그리드에 외부요소 drop 가능 여부
         isDroppable={droppable}
+        //그리드에 drop되는 item의 속성 default => {i: "__dropping-elem__", h: 1, w: 1}
         droppingItem={droppingItem}
+
+        //그리드 크기 제한
         style={{
           //너비는 reponsive에 맞게 최소 480~1200
           maxWidth: "1200px",
           minWidth: "480px",
-          //높이 고정
-          minHeight: "970px",
+          //높이 고정 (행이 6개일 때 기준, 150 * 6 + margin, padding 값 포함)
+          minHeight: "970px", 
           maxHeight: "970px",
           borderRadius: "5px",
           border: "2px solid #3a3a3a",
         }}
+
+        //그리드 내에 변화가 생겼을 때 호출되는 함수
         onLayoutChange={onLayoutChange}
+        //화면상의 그리드의 너비에 따라 breakpoint가 바뀌었을 때 호출되는 함수
         onBreakpointChange={onBreakpointChange}
+        //외부 요소가 drop 되었을 때 호출되는 함수
         onDrop={onDrop}
       >
         {widgets.map((widget, index) => (
@@ -319,4 +350,4 @@ const DashboardDetailView: React.FC<DashboardDetailViewProps> = ({
   );
 };
 
-export default DashboardDetailView;
+export default Dashboard;

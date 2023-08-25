@@ -1,5 +1,5 @@
 import './App.css';
-import DashboardDetailView from './DashboardDetailView';
+import Dashboard from './Dashboard';
 
 //랜덤 컬러 생성
 export const randomPastelColor = () => {
@@ -63,7 +63,7 @@ function App() {
 
   return (
     <div>
-      <DashboardDetailView
+      <Dashboard
         widgetList={widgetList}
       />
     </div>

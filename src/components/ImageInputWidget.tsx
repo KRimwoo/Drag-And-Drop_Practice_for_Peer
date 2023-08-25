@@ -36,7 +36,7 @@ const ImageInputWidget: React.FC = () => {
       )}
       {!isEditMode && (
         <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%', alignItems: 'end' }}>
-          {imageSrc && <img src={imageSrc.toString()} alt="Preview" style={{ width: '100%', height: "240px", objectFit: "contain" }} />}
+          {imageSrc && <img src={imageSrc.toString()} alt="Preview" style={{ width: '100%', height: "200px", objectFit: "contain" }} />}
           <Button sx={{ bottom: '0', right: '0' }} onClick={handleStartEdit}>수정</Button>
         </div>
       )}
