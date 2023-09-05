@@ -14,6 +14,16 @@ const Dummy1 = {
   widgetColor: "#ffffff",
 }
 
+type StateType = {
+  breakpoints: string; // 현재 브레이크포인트를 저장하는 문자열
+  layouts: {
+    [key: string]: {
+      i: string; x: number; y: number; w: number; h: number;
+      minW?: number; minH?: number;
+    }[];
+  };
+};
+
 
 interface DashboardProps {
   widgetList: Array<any>;
@@ -95,7 +105,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           state.layouts[currentBreakpoint][index].w *
           state.layouts[currentBreakpoint][index].h)
     );
-    console.log("totalVolume: ", totalVol);
+    //console.log("totalVolume: ", totalVol);
     if (totalVol >= 30) {
       console.log("grid is full!");
       setDroppable(false);
@@ -104,8 +114,8 @@ const Dashboard: React.FC<DashboardProps> = ({
 
   //레이아웃이 변경될 때, 그 정보를 업데이트 한다.
   const onLayoutChange = (layout: any, layouts: any) => {
-    console.log("on change layout", layout);
-    //console.log("breakpoint", currentBreakpoint, "layouts", layouts);
+    console.log("on change layout", state);
+    //console.log("layouts", layouts);
 
     //아이템이 dropping중 이라면 return
     if (isDroppaing) {
@@ -120,6 +130,8 @@ const Dashboard: React.FC<DashboardProps> = ({
       ...prevState,
       layouts: updatedLayouts,
     }));
+    console.log("updated layouts: ", updatedLayouts);
+    console.log("widgets: ", widgets);
   };
   
   //Drag시작할 때
@@ -143,12 +155,12 @@ const Dashboard: React.FC<DashboardProps> = ({
   //onDrop함수!!!!
   const onDrop = (layout: Layout[], layoutItem: Layout, event: Event) => {
     //레이아웃 업데이트
-    //console.log("item:", layoutItem);
+    console.log("item:", layoutItem);
     //console.log("event:", event);
     
     //drop하는 element의 종류(id) 가져옴 - handleDragStart에서 set했던 data를 get
     const droppedElementId = (event as any).dataTransfer.getData("text/plain");
-    //console.log("Dropped element ID:", droppedElementId);
+    console.log("Dropped element ID:", droppedElementId);
     
     //drop의 위치가 grid 벗어날 경우
     if (layoutItem.x + layoutItem.w > 5 || layoutItem.y + layoutItem.h > 6){
@@ -190,7 +202,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         widgetColor: randomPastelColor(),
       },
     ]);
-    console.log("ondrop:", state);
+    //console.log("ondrop:", state);
     setIndex(index + 1);
     //drag-drop 종료
     setIsDropping(false);
@@ -203,7 +215,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       ...prevState,
       breakpoints: breakpoint,
     }));
-    console.log("breakpoint change!: ", breakpoint);
+    //console.log("breakpoint change!: ", breakpoint);
   };
 
   return (
@@ -216,7 +228,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           maxWidth: "1200px",
         }}
       >
-        <h1>Dashbord</h1>
+        <h1>Dashboard</h1>
         {/* 편집 버튼 */}
         <Button onClick={() => setIsEditMode(!isEditMode)} size="large" sx={{fontWeight: "bold"}}>
           {isEditMode ? "확인" : "편집"}
@@ -325,7 +337,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           <div
             key={widget.widgetId}
             data-grid={{
-              x: state.layouts[currentBreakpoint][index].x,
+              x: state.layouts[currentBreakpoint][index].x, //layouts[state.breakpoint]?
               y: state.layouts[currentBreakpoint][index].y,
               w: state.layouts[currentBreakpoint][index].w,
               h: state.layouts[currentBreakpoint][index].h,
