@@ -97,20 +97,20 @@ const Dashboard: React.FC<DashboardProps> = ({
   });
 
   //레이아웃 공간 계산
-  // useEffect(() => {
-  //   let totalVol = 0;
-  //   widgets.map(
-  //     (widget, index) =>
-  //       (totalVol +=
-  //         state.layouts[currentBreakpoint][index].w *
-  //         state.layouts[currentBreakpoint][index].h)
-  //   );
-  //   //console.log("totalVolume: ", totalVol);
-  //   if (totalVol >= 30) {
-  //     console.log("grid is full!");
-  //     setDroppable(false);
-  //   }
-  // }, [state]);
+  useEffect(() => {
+    let totalVol = 0;
+    widgets.map(
+      (widget, index) =>
+        (totalVol +=
+          state.layouts[currentBreakpoint][index].w *
+          state.layouts[currentBreakpoint][index].h)
+    );
+    //console.log("totalVolume: ", totalVol);
+    if (totalVol >= 30) {
+      console.log("grid is full!");
+      setDroppable(false);
+    }
+  }, [state]);
 
   //레이아웃이 변경될 때, 그 정보를 업데이트 한다.
   const onLayoutChange = (layout: any, layouts: any) => {
